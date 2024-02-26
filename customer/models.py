@@ -10,3 +10,6 @@ class Customer(models.Model):
     image = models.ImageField(
         upload_to='customer/images/', blank=True, null=True)
     mobile_no = models.CharField(max_length=11)
+
+    def __str__(self):
+        return self.user.username

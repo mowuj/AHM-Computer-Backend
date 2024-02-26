@@ -25,3 +25,6 @@ class Order(models.Model):
             else:
                 self.orderId = 1 
         super(Order, self).save(*args, **kwargs)
+
+    def __str__(self):
+        return self.orderId

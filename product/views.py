@@ -25,5 +25,5 @@ class ReviewViewset(viewsets.ModelViewSet):
 
 
 class CartViewset(viewsets.ModelViewSet):
-    queryset = models.Add_to_card.objects.all()
+    queryset = models.Cart.objects.all()
     serializer_class = serializers.CartSerializer
