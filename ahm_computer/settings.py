@@ -31,7 +31,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://pet-fair-bd.onrender.com', 'https://*.127.0.0.1']
+    'https://ahm-computer-backend.onrender.com', 'https://*.127.0.0.1']
 # Application definition
 
 INSTALLED_APPS = [
