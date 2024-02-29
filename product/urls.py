@@ -9,7 +9,7 @@ router.register('list', views.ProductViewset)
 router.register('category', views.CategoryViewset)
 router.register('brand', views.BrandViewset)
 router.register('review', views.ReviewViewset)
-router.register('add_to_cart', views.CartViewset)
+router.register('cart', views.CartViewset)
 
 
 urlpatterns = [
