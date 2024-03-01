@@ -43,15 +43,10 @@ INSTALLED_APPS = [
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_COOKIE_NAME = 'csrftoken'
-CORS_ALLOW_HEADERS = [
-    'access-control-allow-origin',
-    'access-control-allow-headers',
-    'access-control-allow-methods',
-]
+
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:8080",
     'http://127.0.0.1:5500',
-    'http://localhost:3000',
     'https://ahm-computer-backend.onrender.com',
 ]
 CORS_ALLOW_METHODS = (
