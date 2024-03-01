@@ -49,7 +49,7 @@ class Review(models.Model):
 
 
 class Cart(models.Model):
-    orderId = models.IntegerField()
+    cartId = models.IntegerField(null=True, blank=True)
     customer = models.ForeignKey(
         User, related_name="cart_user", on_delete=models.CASCADE)
     product = models.ForeignKey(

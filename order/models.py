@@ -1,30 +1,18 @@
 from django.db import models
 from django.contrib.auth.models import User
 
-from product.models import Product
+from product.models import Cart
 
 # Create your models here.
 
 
 class Order(models.Model):
-    orderId = models.IntegerField(unique=True)
+    orderId = models.IntegerField(null=True, blank=True)
     customer = models.ForeignKey(
         User, related_name="orders", on_delete=models.CASCADE)
-    product = models.ForeignKey(
-        Product, related_name="orders", on_delete=models.CASCADE)
-    Quantity = models.IntegerField()
-    amount = models.IntegerField()
+    cart = models.ForeignKey(
+        Cart, related_name="cart", on_delete=models.CASCADE,null=True,blank=True)
     total_amount = models.IntegerField()
-    payment = models.BooleanField(default=False)
-
-    def save(self, *args, **kwargs):
-        if not self.orderId:
-            last_order = Order.objects.last()
-            if last_order:
-                self.orderId = last_order.orderId + 1010
-            else:
-                self.orderId = 1 
-        super(Order, self).save(*args, **kwargs)
 
     def __str__(self):
         return self.orderId
