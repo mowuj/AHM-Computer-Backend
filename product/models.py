@@ -58,5 +58,15 @@ class Cart(models.Model):
     amount = models.IntegerField(default=0)
     total_amount = models.IntegerField(default=0)
 
+    def calculate_total_price(self):
+        self.amount = self.product.price  
+        self.total_amount = self.Quantity * self.amount
+        return self.total_amount
+
+    def save(self, *args, **kwargs):
+
+        self.calculate_total_price()
+        super().save(*args, **kwargs)
+
     def __str__(self):
-        return self.orderId
+        return f"Order ID: {self.orderId}, Product: {self.product.name}, Quantity: {self.Quantity}, Total Amount: {self.total_amount}"
