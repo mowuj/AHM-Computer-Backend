@@ -16,52 +16,57 @@ from rest_framework.authtoken.models import Token
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.shortcuts import redirect
-
-from .serializers import CustomerSerializer, CustomerProfileSerializer
+from customer.models import Customer
+from .serializers import RegistrationSerializer, CustomerProfileSerializer, CustomerSerializer
 
 
 class UserRegistrationApiView(APIView):
-    serializer_class = serializers.RegistrationSerializer
+    serializer_class = RegistrationSerializer
 
     def post(self, request):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
             user = serializer.save()
-            print(user)
+
+            customer_data = {
+                'user': user,
+                'image': serializer.validated_data.get('image'),
+                'mobile_no': serializer.validated_data.get('mobile_no'),
+                'address': serializer.validated_data.get('address'),
+            }
+            customer = Customer.objects.create(**customer_data)
+
             token = default_token_generator.make_token(user)
-            print("token ", token)
             uid = urlsafe_base64_encode(force_bytes(user.pk))
-            print("uid ", uid)
-            confirm_link = f"http://127.0.0.1:8000/user/active/{uid}/{token}"
+            confirm_link = f"https://ahm-computer-backend.onrender.com/active/{uid}/{token}"
             email_subject = "Confirm Your Email"
             email_body = render_to_string(
-                'confirm_email.html', {'confirm_link': confirm_link})
-
+                'email.html', {'confirm_link': confirm_link})
             email = EmailMultiAlternatives(email_subject, '', to=[user.email])
             email.attach_alternative(email_body, "text/html")
             email.send()
 
-            models.Customer.objects.create(user=user)
+            login(request, user)
 
-            return Response("Check your mail for confirmation")
-        return Response(serializer.errors)
+            return Response("Check your email for confirmation and login.", status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def activate(request, uid64, token):
     try:
         uid = urlsafe_base64_decode(uid64).decode()
         user = User._default_manager.get(pk=uid)
-    except (User.DoesNotExist):
+    except (User.DoesNotExist, ValueError, TypeError, OverflowError):
         user = None
 
     if user is not None and default_token_generator.check_token(user, token):
         user.is_active = True
         user.save()
-        return redirect('login')
+        return redirect('login') 
     else:
-        return redirect('register')
-
+        return redirect('register') 
 
 class UserLoginApiView(APIView):
     def post(self, request):

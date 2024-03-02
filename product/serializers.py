@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from . models import Product, Category, Brand, Review,Cart
+from . models import Product, Category, Brand, Review
 from django.contrib.auth.models import User
 
 
@@ -26,9 +26,3 @@ class ReviewSerializer(serializers.ModelSerializer):
         model = Review
         fields = '__all__'
 
-
-class CartSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Cart
-        fields = ['orderId', 'customer', 'product',
-                  'Quantity', 'amount', 'total_amount']

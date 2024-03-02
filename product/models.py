@@ -47,26 +47,3 @@ class Review(models.Model):
     def __str__(self):
         return self.user.username
 
-
-class Cart(models.Model):
-    cartId = models.IntegerField(null=True, blank=True)
-    customer = models.ForeignKey(
-        User, related_name="cart_user", on_delete=models.CASCADE)
-    product = models.ForeignKey(
-        Product, related_name="cart_product", on_delete=models.CASCADE)
-    Quantity = models.IntegerField()
-    amount = models.IntegerField(default=0)
-    total_amount = models.IntegerField(default=0)
-
-    def calculate_total_price(self):
-        self.amount = self.product.price  
-        self.total_amount = self.Quantity * self.amount
-        return self.total_amount
-
-    def save(self, *args, **kwargs):
-
-        self.calculate_total_price()
-        super().save(*args, **kwargs)
-
-    def __str__(self):
-        return f"Order ID: {self.orderId}, Product: {self.product.name}, Quantity: {self.Quantity}, Total Amount: {self.total_amount}"

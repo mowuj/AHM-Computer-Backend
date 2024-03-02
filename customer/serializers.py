@@ -6,11 +6,14 @@ from .models import Customer
 
 class RegistrationSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(required=True)
+    image = serializers.ImageField(required=False, write_only=True)
+    mobile_no = serializers.CharField(required=True, write_only=True)
+    address = serializers.CharField(required=False, write_only=True)
 
     class Meta:
         model = User
-        fields = ['username', 'first_name', 'last_name',
-                  'email', 'password', 'confirm_password']
+        fields = ['username', 'first_name', 'last_name', 'email', 'password',
+                  'confirm_password', 'image', 'mobile_no', 'address']
 
     def save(self):
         username = self.validated_data['username']
@@ -20,19 +23,30 @@ class RegistrationSerializer(serializers.ModelSerializer):
         password = self.validated_data['password']
         password2 = self.validated_data['confirm_password']
 
+        image = self.validated_data.get('image', None)
+        mobile_no = self.validated_data['mobile_no']
+        address = self.validated_data.get('address', None)
+
         if password != password2:
             raise serializers.ValidationError(
-                {'error': "Password Doesn't Mactched"})
+                {'error': "Password Doesn't Matched"})
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
                 {'error': "Email Already exists"})
-        account = User(username=username, email=email,
-                       first_name=first_name, last_name=last_name)
-        print(account)
-        account.set_password(password)
-        account.is_active = False
-        account.save()
-        return account
+
+        # Create User
+        user = User(username=username, email=email,
+                    first_name=first_name, last_name=last_name)
+        user.set_password(password)
+        user.is_active = False
+        user.save()
+
+        # Create Customer
+        customer = Customer(user=user, image=image,
+                            mobile_no=mobile_no, address=address)
+        customer.save()
+
+        return user
 
 
 class UserLoginSerializer(serializers.Serializer):
