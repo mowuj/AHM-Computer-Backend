@@ -86,6 +86,7 @@ def activate(request, uid64, token):
     else:
         return redirect('register') 
 
+
 class UserLoginApiView(APIView):
     def post(self, request):
         serializer = serializers.UserLoginSerializer(data=self.request.data)
@@ -98,8 +99,12 @@ class UserLoginApiView(APIView):
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
 
+                # Access customer ID from the related 'profile' field
+                customer_id = user.profile.id if hasattr(
+                    user, 'profile') and user.profile else None
+
                 login(request, user)
-                return Response({'token': token.key, 'user_id': user.id})
+                return Response({'token': token.key, 'user_id': user.id, 'customer_id': customer_id})
             else:
                 return Response({'error': "Invalid Credential"})
         return Response(serializer.errors)
