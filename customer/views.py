@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework import viewsets
-
+from django.db import IntegrityError, transaction
 from . import models
 from . import serializers
 from rest_framework.views import APIView
@@ -27,29 +27,47 @@ class UserRegistrationApiView(APIView):
         serializer = self.serializer_class(data=request.data)
 
         if serializer.is_valid():
-            user = serializer.save()
+            try:
+                with transaction.atomic():
+                    user = serializer.save()
 
-            customer_data = {
-                'user': user,
-                'image': serializer.validated_data.get('image'),
-                'mobile_no': serializer.validated_data.get('mobile_no'),
-                'address': serializer.validated_data.get('address'),
-            }
-            customer = Customer.objects.create(**customer_data)
+                    # Explicitly check if a Customer object exists
+                    customer, created = Customer.objects.get_or_create(
+                        user=user,
+                        defaults={
+                            'image': serializer.validated_data.get('image'),
+                            'mobile_no': serializer.validated_data.get('mobile_no'),
+                            'address': serializer.validated_data.get('address'),
+                        }
+                    )
 
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            confirm_link = f"https://ahm-computer-backend.onrender.com/active/{uid}/{token}"
-            email_subject = "Confirm Your Email"
-            email_body = render_to_string(
-                'email.html', {'confirm_link': confirm_link})
-            email = EmailMultiAlternatives(email_subject, '', to=[user.email])
-            email.attach_alternative(email_body, "text/html")
-            email.send()
+                    if not created:
+                        # If customer already exists, update the fields
+                        customer.image = serializer.validated_data.get('image')
+                        customer.mobile_no = serializer.validated_data.get(
+                            'mobile_no')
+                        customer.address = serializer.validated_data.get(
+                            'address')
+                        customer.save()
 
-            login(request, user)
+                    token = default_token_generator.make_token(user)
+                    uid = urlsafe_base64_encode(force_bytes(user.pk))
+                    confirm_link = f"https://ahm-computer-backend.onrender.com/customer/active/{uid}/{token}"
+                    email_subject = "Confirm Your Email"
+                    email_body = render_to_string(
+                        'email.html', {'confirm_link': confirm_link})
+                    email = EmailMultiAlternatives(
+                        email_subject, '', to=[user.email])
+                    email.attach_alternative(email_body, "text/html")
+                    email.send()
 
-            return Response("Check your email for confirmation and login.", status=status.HTTP_201_CREATED)
+                    login(request, user)
+
+                    return Response("Check your email for confirmation and login.", status=status.HTTP_201_CREATED)
+            except IntegrityError as e:
+                # Log the error for further investigation
+                print(f"ERROR: {str(e)}")
+                return Response(f"An error occurred during registration: {str(e)}", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

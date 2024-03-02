@@ -41,13 +41,16 @@ class RegistrationSerializer(serializers.ModelSerializer):
         user.is_active = False
         user.save()
 
-        # Create Customer
-        customer = Customer(user=user, image=image,
-                            mobile_no=mobile_no, address=address)
-        customer.save()
+        # Explicitly set user_id when creating Customer
+        customer_data = {
+            'user_id': user.id,
+            'image': image,
+            'mobile_no': mobile_no,
+            'address': address,
+        }
+        customer = Customer.objects.create(**customer_data)
 
         return user
-
 
 class UserLoginSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -78,4 +81,4 @@ class CustomerSerializer(serializers.ModelSerializer):
 class CustomerProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
-        fields = ['user', 'image', 'balance', 'mobile_no']
+        fields = ['user', 'image', 'mobile_no']
