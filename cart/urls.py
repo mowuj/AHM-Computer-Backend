@@ -5,7 +5,7 @@ from . import views
 router = DefaultRouter()
 
 
-router.register('', views.CartViewset)
+router.register('list', views.CartViewset)
 router.register('cartProduct', views.CartProductViewset)
 
 
