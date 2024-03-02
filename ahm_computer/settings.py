@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'contact_us',
     'product',
     'order',
-    'Cart',
+    'cart',
     'payment',
     'rest_framework',
     'rest_framework.authtoken',
