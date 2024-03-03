@@ -6,7 +6,6 @@ from django.contrib.auth.models import User
 
 
 class Order(models.Model):
-    orderId = models.IntegerField(null=True, blank=True)
     customer = models.ForeignKey(
         User, related_name="orders", on_delete=models.CASCADE)
 
