@@ -3,8 +3,8 @@ from . import models
 from . import serializers
 # Create your views here.
 from rest_framework import viewsets
-
-
+from rest_framework.response import Response
+from rest_framework import status
 class CartViewset(viewsets.ModelViewSet):
     queryset = models.Cart.objects.all()
     serializer_class = serializers.CartSerializer
@@ -31,3 +31,8 @@ class CartProductViewset(viewsets.ModelViewSet):
         else:
 
             return super().create(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        return Response(status=status.HTTP_204_NO_CONTENT)
