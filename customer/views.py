@@ -126,11 +126,3 @@ class CustomerViewSet(viewsets.ModelViewSet):
         queryset = models.Customer.objects.filter(user=user)
         return queryset
 
-
-class CustomerProfileViewSet(viewsets.ModelViewSet):
-    serializer_class = CustomerProfileSerializer
-
-    def get_queryset(self):
-        user = self.request.user
-        queryset = models.UserProfile.objects.filter(user=user)
-        return queryset

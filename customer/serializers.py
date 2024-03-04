@@ -76,9 +76,3 @@ class CustomerSerializer(serializers.ModelSerializer):
     class Meta:
         model = Customer
         fields = '__all__'
-
-
-class CustomerProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Customer
-        fields = ['user', 'image', 'mobile_no']
