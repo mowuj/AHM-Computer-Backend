@@ -17,7 +17,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.shortcuts import redirect
 from customer.models import Customer
-from .serializers import RegistrationSerializer, CustomerProfileSerializer, CustomerSerializer
+from .serializers import RegistrationSerializer, CustomerSerializer
 
 
 class UserRegistrationApiView(APIView):
