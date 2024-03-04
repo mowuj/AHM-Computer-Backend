@@ -20,7 +20,6 @@ METHOD = (
 class Order(models.Model):
     customer = models.ForeignKey(
         Customer, on_delete=models.CASCADE)
-    cart = models.OneToOneField(Cart, on_delete=models.CASCADE)
     ordered_by = models.CharField(max_length=250)
     phone = models.CharField(max_length=13)
     email = models.EmailField(null=True, blank=True)
