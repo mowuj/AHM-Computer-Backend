@@ -18,7 +18,7 @@ from django.template.loader import render_to_string
 from django.shortcuts import redirect
 from customer.models import Customer
 from .serializers import RegistrationSerializer, CustomerSerializer
-
+from rest_framework.permissions import IsAuthenticated
 
 class UserRegistrationApiView(APIView):
     serializer_class = RegistrationSerializer
@@ -120,7 +120,7 @@ class UserLogoutView(APIView):
 
 class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
-
+    permission_classes = [IsAuthenticated]
     def get_queryset(self):
         user = self.request.user
         queryset = models.Customer.objects.filter(user=user)
