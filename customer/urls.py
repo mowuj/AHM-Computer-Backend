@@ -1,10 +1,10 @@
 from django.urls import include, path
-from .views import UserLoginApiView, UserLogoutView, CustomerViewSet, UserRegistrationApiView, activate
+from .views import UserLoginApiView, UserLogoutView, CustomerDataView, UserRegistrationApiView, activate
 from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('data', CustomerViewSet, basename='data')
+router.register('data', CustomerDataView, basename='data')
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', UserRegistrationApiView.as_view(), name='register'),

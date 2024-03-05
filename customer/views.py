@@ -118,7 +118,12 @@ class UserLogoutView(APIView):
 
 
 
-class CustomerViewSet(viewsets.ModelViewSet):
-    serializer_class = CustomerSerializer
-    queryset = Customer.objects.all()
+class CustomerDataView(APIView):
+    def get(self, request, customer_id):
+        try:
+            customer = Customer.objects.get(id=customer_id)
+            serializer = CustomerSerializer(customer)
+            return Response(serializer.data)
+        except Customer.DoesNotExist:
+            return Response({"error": "Customer not found"}, status=404)
 
