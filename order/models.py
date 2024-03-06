@@ -21,9 +21,10 @@ METHOD = (
 class Order(models.Model):
     cart = models.ForeignKey(
         Cart, on_delete=models.SET_NULL, null=True, blank=True)
-    ordered_by = models.CharField(max_length=255)
+    ordered_by = models.ForeignKey(Customer, on_delete=models.CASCADE)
     total_amount = models.PositiveIntegerField(default=0)
-    order_status = models.CharField(max_length=250, choices=ORDER_STATUS)
+    order_status = models.CharField(
+        max_length=250, choices=ORDER_STATUS, default="Order Received")
     created_at = models.DateTimeField(auto_now_add=True)
 
 class OrderProduct(models.Model):
