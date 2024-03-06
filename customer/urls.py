@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 
 router = DefaultRouter()
-router.register('data', CustomerDataView.as_view(), basename='data')
+router.register('data', CustomerDataView, basename='data')
 urlpatterns = [
     path('', include(router.urls)),
     path('register/', UserRegistrationApiView.as_view(), name='register'),

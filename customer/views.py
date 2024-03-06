@@ -117,13 +117,11 @@ class UserLogoutView(APIView):
         return redirect('login')
 
 
-
-class CustomerDataView(APIView):
-    def get(self, request, customer_id):
+class CustomerDataView(viewsets.ViewSet):
+    def retrieve(self, request, pk=None):
         try:
-            customer = Customer.objects.get(id=customer_id)
+            customer = Customer.objects.get(id=pk)
             serializer = CustomerSerializer(customer)
             return Response(serializer.data)
         except Customer.DoesNotExist:
             return Response({"error": "Customer not found"}, status=404)
-
