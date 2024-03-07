@@ -37,7 +37,6 @@ class CartProductViewset(viewsets.ModelViewSet):
                     self.perform_create(serializer)
 
                 if request.data.get('order_now'):
-                    # Calculate total amount based on existing cart products
                     cart_products = models.CartProduct.objects.filter(
                         cart=cart_id)
                     total_amount = sum(
@@ -48,7 +47,6 @@ class CartProductViewset(viewsets.ModelViewSet):
                         "ordered_by": request.data.get('ordered_by'),
                         "total_amount": total_amount,
                         "order_status": request.data.get('order_status'),
-                        # ... other fields for order details
                     }
 
                     order_serializer = serializers.OrderSerializer(
@@ -78,7 +76,6 @@ class CartProductViewset(viewsets.ModelViewSet):
             return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return Response({"message": "Cart product created or updated successfully"}, status=status.HTTP_201_CREATED)
-
 
     def destroy(self, request, *args, **kwargs):
         instance = self.get_object()
