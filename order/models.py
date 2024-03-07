@@ -19,8 +19,6 @@ METHOD = (
 
 
 class Order(models.Model):
-    cart = models.ForeignKey(
-        Cart, on_delete=models.SET_NULL, null=True, blank=True)
     ordered_by = models.ForeignKey(Customer, on_delete=models.CASCADE)
     total_amount = models.PositiveIntegerField(default=0)
     order_status = models.CharField(
