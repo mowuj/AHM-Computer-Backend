@@ -8,3 +8,6 @@ from . import serializers
 class OrderViewset(viewsets.ModelViewSet):
     queryset = models.Order.objects.all()
     serializer_class = serializers.OrderSerializer
+class ShipmentViewset(viewsets.ModelViewSet):
+    queryset = models.Shipment.objects.all()
+    serializer_class = serializers.ShipmentSerializer
