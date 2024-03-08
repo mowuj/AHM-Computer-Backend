@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from .constants import RATING
+from django.utils.text import slugify
 # Create your models here.
 
 
@@ -8,6 +9,9 @@ class Category(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
 
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.name
 
@@ -15,6 +19,10 @@ class Category(models.Model):
 class Brand(models.Model):
     name = models.CharField(max_length=50)
     slug = models.SlugField(max_length=50, unique=True)
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
     def __str__(self):
         return self.name
 
@@ -31,7 +39,6 @@ class Product(models.Model):
     discount=models.PositiveIntegerField(null=True,default=0)
     def __str__(self):
         return f"name: {self.name}, category: {self.category}, brand: {self.brand}"
-
 
 
 class Review(models.Model):
