@@ -99,21 +99,17 @@ class UserLoginApiView(APIView):
             if user:
                 token, _ = Token.objects.get_or_create(user=user)
 
-                # Access customer ID from the related 'profile' field
                 customer_id = user.profile.id if hasattr(
                     user, 'profile') and user.profile else None
 
                 login(request, user)
 
-                # Include is_admin_customer attribute in the response
-                is_admin_customer = user.profile.is_admin_customer if hasattr(
-                    user, 'profile') else False
+                is_staff = user.is_staff
 
-                return Response({'token': token.key, 'user_id': user.id, 'customer_id': customer_id, 'isAdmin': is_admin_customer})
+                return Response({'token': token.key, 'user_id': user.id, 'customer_id': customer_id, 'isStaff': is_staff})
             else:
                 return Response({'error': "Invalid Credential"})
         return Response(serializer.errors)
-
 
 
 class UserLogoutView(APIView):
