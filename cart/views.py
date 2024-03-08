@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from . import models
-from . import serializers
+from .models import Cart,CartProduct
+from .serializers import CartSerializer,CartProductSerializer
+from order.serializers import OrderSerializer,OrderProductSerializer
 # Create your views here.
 from rest_framework import viewsets
 from rest_framework.response import Response
@@ -8,14 +9,15 @@ from rest_framework import status
 from django.db import transaction
 from django.core.exceptions import ValidationError
 from django.db.utils import IntegrityError
+
 class CartViewset(viewsets.ModelViewSet):
-    queryset = models.Cart.objects.all()
-    serializer_class = serializers.CartSerializer
+    queryset = Cart.objects.all()
+    serializer_class = CartSerializer
 
 
 class CartProductViewset(viewsets.ModelViewSet):
-    queryset = models.CartProduct.objects.all()
-    serializer_class = serializers.CartProductSerializer
+    queryset = CartProduct.objects.all()
+    serializer_class = CartProductSerializer
 
     def create(self, request, *args, **kwargs):
         cart_id = request.data.get('cart')
@@ -24,7 +26,7 @@ class CartProductViewset(viewsets.ModelViewSet):
 
         try:
             with transaction.atomic():
-                existing_cart_product = models.CartProduct.objects.filter(
+                existing_cart_product = CartProduct.objects.filter(
                     cart=cart_id, product=product_id).first()
 
                 if existing_cart_product:
@@ -38,7 +40,7 @@ class CartProductViewset(viewsets.ModelViewSet):
                     self.perform_create(serializer)
 
                 if request.data.get('order_now'):
-                    cart_products = models.CartProduct.objects.filter(
+                    cart_products = CartProduct.objects.filter(
                         cart=cart_id)
                     total_amount = sum(
                         cart_product.subtotal for cart_product in cart_products)
@@ -50,7 +52,7 @@ class CartProductViewset(viewsets.ModelViewSet):
                         "order_status": request.data.get('order_status'),
                     }
 
-                    order_serializer = serializers.OrderSerializer(
+                    order_serializer = OrderSerializer(
                         data=order_data)
                     order_serializer.is_valid(raise_exception=True)
                     order_instance = order_serializer.save()
@@ -63,7 +65,7 @@ class CartProductViewset(viewsets.ModelViewSet):
                             "quantity": cart_product.quantity,
                             "subtotal": cart_product.subtotal,
                         }
-                        order_product_serializer = serializers.OrderProductSerializer(
+                        order_product_serializer = OrderProductSerializer(
                             data=order_product_data)
                         order_product_serializer.is_valid(raise_exception=True)
                         order_product_serializer.save()
