@@ -6,7 +6,8 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
-
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
 class CartViewset(viewsets.ModelViewSet):
     queryset = models.Cart.objects.all()
     serializer_class = serializers.CartSerializer
@@ -51,26 +52,31 @@ class CartProductViewset(viewsets.ModelViewSet):
 
                     order_serializer = serializers.OrderSerializer(
                         data=order_data)
-                    if order_serializer.is_valid():
-                        order_instance = order_serializer.save()
+                    order_serializer.is_valid(raise_exception=True)
+                    order_instance = order_serializer.save()
 
-                        for cart_product in cart_products:
-                            order_product_data = {
-                                "order": order_instance.id,
-                                "product": cart_product.product.id,
-                                "price": cart_product.price,
-                                "quantity": cart_product.quantity,
-                                "subtotal": cart_product.subtotal,
-                            }
-                            order_product_serializer = serializers.OrderProductSerializer(
-                                data=order_product_data)
-                            if order_product_serializer.is_valid():
-                                order_product_serializer.save()
-                            else:
-                                raise serializers.ValidationError(
-                                    order_product_serializer.errors)
+                    for cart_product in cart_products:
+                        order_product_data = {
+                            "order": order_instance.id,
+                            "product": cart_product.product.id,
+                            "price": cart_product.price,
+                            "quantity": cart_product.quantity,
+                            "subtotal": cart_product.subtotal,
+                        }
+                        order_product_serializer = serializers.OrderProductSerializer(
+                            data=order_product_data)
+                        order_product_serializer.is_valid(raise_exception=True)
+                        order_product_serializer.save()
 
-                        return Response({"message": "Order placed successfully"}, status=status.HTTP_201_CREATED)
+                    return Response({"message": "Order placed successfully"}, status=status.HTTP_201_CREATED)
+
+        except IntegrityError as integrity_error:
+
+            return Response({"error": str(integrity_error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        except ValidationError as validation_error:
+
+            return Response({"error": str(validation_error)}, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as error:
             return Response({"error": str(error)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
