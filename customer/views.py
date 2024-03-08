@@ -104,10 +104,16 @@ class UserLoginApiView(APIView):
                     user, 'profile') and user.profile else None
 
                 login(request, user)
-                return Response({'token': token.key, 'user_id': user.id, 'customer_id': customer_id})
+
+                # Include is_admin_customer attribute in the response
+                is_admin_customer = user.profile.is_admin_customer if hasattr(
+                    user, 'profile') else False
+
+                return Response({'token': token.key, 'user_id': user.id, 'customer_id': customer_id, 'isAdmin': is_admin_customer})
             else:
                 return Response({'error': "Invalid Credential"})
         return Response(serializer.errors)
+
 
 
 class UserLogoutView(APIView):
