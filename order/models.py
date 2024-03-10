@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from cart.models import Cart
 from customer.models import Customer
 from product.models import Product
+from payment .models import Payment
 # Create your models here.
 
 ORDER_STATUS = (
@@ -23,6 +24,9 @@ class Order(models.Model):
     total_amount = models.PositiveIntegerField(default=0)
     order_status = models.CharField(
         max_length=250, choices=ORDER_STATUS, default="Order Received")
+    payment = models.ForeignKey(
+        Payment, on_delete=models.SET_NULL, null=True, blank=True)
+    payment_completed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class OrderProduct(models.Model):
@@ -30,10 +34,11 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     price = models.PositiveIntegerField()
     quantity = models.PositiveIntegerField()
-    subtotal = models.PositiveIntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     class Meta:
         unique_together = ('order', 'product')
+
+
 
 class Shipment(models.Model):
     customer = models.ForeignKey(
@@ -48,8 +53,5 @@ class Shipment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     payment_method = models.CharField(
         max_length=20, choices=METHOD, default="Cash On Delivery")
-    payment_completed = models.BooleanField(
-        default=False, null=True, blank=True)
-
     def __str__(self):
         return "Order: " + str(self.id)

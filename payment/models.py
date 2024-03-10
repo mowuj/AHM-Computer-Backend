@@ -1,20 +1,13 @@
 from django.db import models
 from django.contrib.auth.models import User
-
+from customer.models import Customer
 # Create your models here.
 
 
-class Details(models.Model):
-    user = models.ForeignKey(
-        User, related_name="details", on_delete=models.CASCADE)
-    name = models.CharField(max_length=100)
-    mobile = models.CharField(max_length=11)
-    email = models.EmailField(max_length=100)
-    address = models.CharField(max_length=200)
-    landmark=models.CharField(max_length=200)
-    postcode = models.CharField(max_length=50)
-    city = models.CharField(max_length=150)
-    country = models.CharField(max_length=100)
+class Payment(models.Model):
+    customer = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f"{self.user.username} - {self.amount} INR - {self.payment_date}"

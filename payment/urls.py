@@ -4,10 +4,9 @@ from . import views
 
 router = DefaultRouter()
 
-router.register('list', views.BillingDetailsViewset) 
+router.register('list', views.PaymentViewset) 
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('user-billing-details/', views.ShowUserBillingDetails.as_view(), name='user-billing-details'),
-    path('user-billing-details-update/<int:id>/', views.UpdateBillingDetails.as_view(), name='user-billing-details-update'),
+    
 ]
