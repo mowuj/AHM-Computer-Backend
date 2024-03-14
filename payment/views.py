@@ -5,7 +5,7 @@ from .models import Payment
 from .serializers import PaymentSerializer
 from customer.models import Customer
 import stripe
-from decimal import Decimal 
+from decimal import Decimal
 from django.conf import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
@@ -28,10 +28,11 @@ class PaymentViewset(viewsets.ModelViewSet):
 
         amount_decimal = Decimal(amount)
 
+
         payment_intent = stripe.PaymentIntent.create(
             amount=int(amount_decimal * 100),
             currency='inr',
-            customer=customer,
+            customer=customer.stripe_id,
         )
 
         payment = Payment.objects.create(
