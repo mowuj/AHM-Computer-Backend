@@ -29,7 +29,7 @@ class PaymentViewset(viewsets.ModelViewSet):
             amount=int(amount * 100), 
             currency='inr',
             
-            customer=customer.stripe_customer_id,
+            customer=customer.id,
         )
 
         payment = Payment.objects.create(
