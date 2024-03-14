@@ -31,7 +31,7 @@ class PaymentViewset(viewsets.ModelViewSet):
         payment_intent = stripe.PaymentIntent.create(
             amount=int(amount_decimal * 100),
             currency='inr',
-            customer=customer.id,
+            customer=customer,
         )
 
         payment = Payment.objects.create(
