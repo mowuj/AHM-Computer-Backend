@@ -1,14 +1,15 @@
 from rest_framework.response import Response
 from rest_framework import viewsets
-from rest_framework.views import APIView
 from rest_framework import status
 from .models import Payment
-from . serializers import PaymentSerializer
+from .serializers import PaymentSerializer
 from customer.models import Customer
 import stripe
+from decimal import Decimal 
 from django.conf import settings
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
-DOMAIN='https://ahm-computer-backend.onrender.com'
+DOMAIN = 'https://ahm-computer-backend.onrender.com'
 
 
 class PaymentViewset(viewsets.ModelViewSet):
@@ -25,16 +26,17 @@ class PaymentViewset(viewsets.ModelViewSet):
 
         customer = Customer.objects.get(id=customer_id)
 
+        amount_decimal = Decimal(amount)
+
         payment_intent = stripe.PaymentIntent.create(
-            amount=int(amount * 100), 
+            amount=int(amount_decimal * 100),
             currency='inr',
-            
             customer=customer.id,
         )
 
         payment = Payment.objects.create(
             customer=customer,
-            amount=amount,
+            amount=amount_decimal,
         )
 
         return Response({'client_secret': payment_intent.client_secret}, status=status.HTTP_201_CREATED)
