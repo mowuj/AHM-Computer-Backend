@@ -18,25 +18,25 @@ class PaymentViewset(viewsets.ModelViewSet):
 
     def create(self, request, *args, **kwargs):
         customer_id = request.data.get('customer')
+        
+        stripe_customer_id = request.data.get('stripe_customer_id')
         amount = request.data.get('amount')
 
         serializer = self.get_serializer(
-            data={'customer': customer_id, 'amount': amount})
+            data={'customer': customer_id, 'stripe_customer_id': stripe_customer_id, 'amount': amount})
         serializer.is_valid(raise_exception=True)
 
-        customer = Customer.objects.get(id=customer_id)
-
         amount_decimal = Decimal(amount)
-
 
         payment_intent = stripe.PaymentIntent.create(
             amount=int(amount_decimal * 100),
             currency='inr',
-            customer=customer.stripe_id,
+            customer=stripe_customer_id,
         )
 
         payment = Payment.objects.create(
-            customer=customer,
+            customer_id=customer_id,
+            stripe_customer_id=stripe_customer_id,
             amount=amount_decimal,
         )
 
